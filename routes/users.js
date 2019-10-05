@@ -5,34 +5,42 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 
 
-router.get('/', (req, res, next) => {
-  // jwt.verify(
-  //   req.token,
-  //   'secretKey',
-  //   (err, authData) => {
-  //     if (err) next(err);
-  //       User.find({})
-  //         .then( result => {
-  //           if (result.length){
-  //             res.status(200).json({
-  //               result
-  //             })
-  //           }else
-  //             res.status(404).send('Who let the dogs out');
-  //         })
-  //   .catch(next);
-  //   }
-  // )
-  User.find({})
-    .then(result => {
-        if(result.length){
-          res.status(200).json({ result });
-        }
-        else {
-            res.status(404).send('No Users');
-        }
-    })
-    .catch(next)
+router.get('/', verifyToken, (req, res, next) => {
+  console.log("Estoy en la ruta");
+  jwt.verify(
+    req.token,
+    'secretKey',
+    (err, authData) => {
+      console.log("Error de verify " + err);
+      if (err) next(err);
+      User.find({})
+          .then(result => {
+              console.log("Result " + result);
+              if (result.length){
+                console.log("Si entre al result");
+                // res.status(200).json({
+                //   result
+                // })
+                res.send("HOLA");
+              }
+              else{
+                res.status(404).send('Who let the dogs out');
+              }
+          })
+          .catch(next);
+    }
+  )
+
+  // User.find({})
+  //   .then(result => {
+  //       if(result.length){
+  //         res.status(200).json({ result });
+  //       }
+  //       else {
+  //           res.status(404).send('No Users');
+  //       }
+  //   })
+  //   .catch(next)
 
 });
 
@@ -99,7 +107,7 @@ router.post('/login', (req, res, next) => {
                 jwt.sign(
                   { result }, //authData
                   'secretKey', //secret
-                  { expiresIn: '120s' },
+                  { expiresIn: '500s' },
                   (err, accessToken) => {
                     if(err) next({
                       message: "Invalid operation",
@@ -133,6 +141,7 @@ function verifyToken(req, res, next){
   //token es orrecto y válido
   //if true next()
   //if false next(err)
+  console.log("EStoy en verifyToken");
   const bearerHeader = req.headers['authorization'];
   let token = bearerHeader.split(' ');
   if(token && token[1]){
