@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 
 
-router.get('/', verifyToken, (req, res, next) => {
+router.get('/', (req, res, next) => {
   console.log("Estoy en la ruta");
   jwt.verify(
     req.token,
@@ -133,8 +133,16 @@ router.post('/login', (req, res, next) => {
           }
         })
         .catch(next);
+});
 
+router.delete('/:id', (req, res, next) =>{
+    let id = req.params.id;
 
+    User.findByIdAndRemove(id)
+        .then(() => {
+          res.status(204).json({});
+        })
+        .catch(next)
 });
 
 function verifyToken(req, res, next){
